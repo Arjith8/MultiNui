@@ -1,16 +1,22 @@
 use std::io;
 
-use ratatui::{DefaultTerminal, Frame, crossterm::{event::{self, Event, KeyCode, KeyEvent, KeyEventKind}, style::Stylize}, layout::Alignment, style::Style, symbols::border, text::Line, widgets::{Block, Paragraph, Widget}};
+use ratatui::{
+    DefaultTerminal, Frame,
+    crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind},
+    style::Style,
+    text::Line,
+    widgets::{Block, Paragraph, Widget},
+};
 
-use crate::{colours::{IRIS, PINE}, widgets::title::TitleBar};
+use crate::{colors::PINE, widgets::title::TitleBar};
 
-mod colours;
+mod colors;
 mod widgets;
 
 #[derive(Debug, Default)]
 struct App {
     message: String,
-    exit: bool
+    exit: bool,
 }
 
 impl App {
@@ -51,7 +57,7 @@ impl App {
 }
 
 impl Widget for &App {
-    fn render(self, area: ratatui::prelude::Rect, buf: &mut ratatui::prelude::Buffer){
+    fn render(self, area: ratatui::prelude::Rect, buf: &mut ratatui::prelude::Buffer) {
         let chunks = ratatui::prelude::Layout::vertical([
             ratatui::prelude::Constraint::Length(1),
             ratatui::prelude::Constraint::Fill(1),
@@ -67,9 +73,8 @@ impl Widget for &App {
         Paragraph::new(Line::from(self.message.as_str()))
             .block(content_block)
             .render(chunks[1], buf);
-
     }
 }
-fn main() -> io::Result<()>{
+fn main() -> io::Result<()> {
     ratatui::run(|terminal| App::default().run(terminal))
 }
