@@ -1,6 +1,11 @@
 use std::io;
 
-use ratatui::{DefaultTerminal, Frame, crossterm::{event::{self, Event, KeyCode, KeyEvent, KeyEventKind}, style::Stylize}, symbols::border, text::Line, widgets::{Block, Widget}};
+use ratatui::{DefaultTerminal, Frame, crossterm::{event::{self, Event, KeyCode, KeyEvent, KeyEventKind}, style::Stylize}, layout::Alignment, style::Style, symbols::border, text::Line, widgets::{Block, Paragraph, Widget}};
+
+use crate::{colours::{IRIS, PINE}, widgets::title::TitleBar};
+
+mod colours;
+mod widgets;
 
 #[derive(Debug, Default)]
 struct App {
@@ -47,12 +52,23 @@ impl App {
 
 impl Widget for &App {
     fn render(self, area: ratatui::prelude::Rect, buf: &mut ratatui::prelude::Buffer){
-        let block = Block::bordered()
-            .title(Line::from(self.message.as_str()).centered())
-            .border_set(border::THICK)
-            .render(area, buf);
+        let chunks = ratatui::prelude::Layout::vertical([
+            ratatui::prelude::Constraint::Length(1),
+            ratatui::prelude::Constraint::Fill(1),
+        ])
+        .split(area);
+
+        let title_bar = TitleBar::default();
+        title_bar.render(chunks[0], buf);
+
+        let content_block = Block::new()
+            .title(" Content ")
+            .border_style(Style::new().fg(PINE));
+        Paragraph::new(Line::from(self.message.as_str()))
+            .block(content_block)
+            .render(chunks[1], buf);
+
     }
-    
 }
 fn main() -> io::Result<()>{
     ratatui::run(|terminal| App::default().run(terminal))
