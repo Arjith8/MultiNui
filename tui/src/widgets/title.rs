@@ -5,7 +5,7 @@ use ratatui::{
     widgets::{Block, Widget},
 };
 
-use crate::colors::{IRIS, LOVE, ROSE};
+use crate::{colors::{IRIS, LOVE, ROSE}, utils::padding::add_padding};
 
 #[derive(Debug)]
 pub struct TitleBar {
@@ -18,7 +18,7 @@ impl TitleBar {
     }
     pub fn default() -> Self {
         Self {
-            text: " MultiNui Goals Manager ".into(),
+            text: "MultiNui Goals Manager".into(),
         }
     }
 }
@@ -33,8 +33,12 @@ impl Widget for &TitleBar {
         ])
         .split(area);
 
+        let padded_title = add_padding(1, vec![self.text.to_string()])
+                            .pop()
+                            .unwrap();
+
         Block::new()
-            .title(self.text.as_str().fg(IRIS))
+            .title(padded_title.fg(IRIS))
             .title_alignment(Alignment::Right)
             .render(chunks[0], buf);
 

@@ -1,25 +1,38 @@
 use std::io;
 
 use ratatui::{
-    DefaultTerminal, Frame,
-    crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind},
-    style::Style,
-    text::Line,
-    widgets::{Block, Paragraph, Widget},
+    DefaultTerminal, Frame, crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind}, style::Style, widgets::{Tabs, Widget},
 };
+use ratatui_comfy_toaster::{ToastBuilder, ToastEngine, ToastEngineBuilder, ToastMessage};
 
-use crate::{colors::PINE, widgets::title::TitleBar};
+use crate::{colors::{ROSE}, common::{db::{self, DB}, goal::GoalSheet, types::{Error, ErrorLevel::FATAL}}, utils::padding::add_padding, widgets::title::TitleBar};
 
 mod colors;
 mod widgets;
+mod utils;
+mod common;
 
-#[derive(Debug, Default)]
 struct App {
     message: String,
+    goal_sheet: Vec<GoalSheet>,
+    conn: DB,
+    error: Option<Error>,
     exit: bool,
+    toast_engine: Option<ToastEngine<ToastMessage>>
 }
 
 impl App {
+    pub fn new() -> Self{
+        let conn = db::DB::open().unwrap();
+        return Self { 
+            error: None,
+            message: "".to_string(),
+            goal_sheet: Vec::new(),
+            conn,
+            exit: false,
+            toast_engine: None
+        }
+    }
     pub fn run(&mut self, terminal: &mut DefaultTerminal) -> io::Result<()> {
         while !self.exit {
             terminal.draw(|frame| self.draw(frame))?;
@@ -28,8 +41,11 @@ impl App {
         Ok(())
     }
 
-    fn draw(&self, frame: &mut Frame) {
-        frame.render_widget(self, frame.area());
+    fn draw(&mut self, frame: &mut Frame) {
+        if self.toast_engine.is_none(){
+            self.toast_engine = Some(ToastEngineBuilder::new(frame.area()).build());
+        }
+        frame.render_widget(&*self, frame.area());
     }
 
     fn handle_events(&mut self) -> io::Result<()> {
@@ -60,21 +76,15 @@ impl Widget for &App {
     fn render(self, area: ratatui::prelude::Rect, buf: &mut ratatui::prelude::Buffer) {
         let chunks = ratatui::prelude::Layout::vertical([
             ratatui::prelude::Constraint::Length(1),
-            ratatui::prelude::Constraint::Fill(1),
+            ratatui::prelude::Constraint::Length(3),
         ])
         .split(area);
-
+        
         let title_bar = TitleBar::default();
         title_bar.render(chunks[0], buf);
-
-        let content_block = Block::new()
-            .title(" Content ")
-            .border_style(Style::new().fg(PINE));
-        Paragraph::new(Line::from(self.message.as_str()))
-            .block(content_block)
-            .render(chunks[1], buf);
     }
 }
+
 fn main() -> io::Result<()> {
-    ratatui::run(|terminal| App::default().run(terminal))
+    ratatui::run(|terminal| App::new().run(terminal))
 }

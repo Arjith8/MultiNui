@@ -10,4 +10,7 @@ features = [
 ]
 
 [dependencies]
+dotenvy = "0.15.7"
 ratatui = "0.30.2"
+ratatui-comfy-toaster = "0.6.2"
+rusqlite = "0.40.1"
