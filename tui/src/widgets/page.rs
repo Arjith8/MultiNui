@@ -29,8 +29,8 @@ impl Default for PageIndicator {
             current: 0,
             pages: vec![
                 Page::new(0, "Home", "H"),
-                Page::new(1, "Logs", "L"),
-                Page::new(2, "Settings", "S"),
+                Page::new(1, "Logs", " L"),
+                Page::new(2, "Settings", " S"),
             ],
         }
     }
@@ -41,14 +41,12 @@ impl Widget for PageIndicator {
     {
         let mut page_span_vec = vec![];
         for page in self.pages{
-            page_span_vec.push(Span::raw(" "));
             let span = if self.current == page.id {
                 Span::styled(page.abbr, Style::new().fg(IRIS))
             } else {
                 Span::raw(page.abbr)
             };
             page_span_vec.push(span);
-            page_span_vec.push(Span::raw(" "));
         }
         Paragraph::new(Line::from(page_span_vec)).render(area, buf);
     }
