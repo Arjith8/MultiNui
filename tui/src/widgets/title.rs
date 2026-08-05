@@ -4,23 +4,21 @@ use ratatui::{
 
 use crate::{colors::{IRIS, LOVE, ROSE}, utils::padding::add_padding, widgets::page::PageIndicator};
 
-#[derive(Debug)]
-pub struct TitleBar {
+pub struct TitleBar<'a> {
     text: String,
+    page_indicator: &'a PageIndicator
 }
 
-impl TitleBar {
-    pub fn new(text: impl Into<String>) -> Self {
-        Self { text: text.into() }
-    }
-    pub fn default() -> Self {
-        Self {
-            text: "MultiNui Goals Manager".into(),
+impl <'a> TitleBar <'a> {
+    pub fn new(text: impl Into<String>, page_indicator: &'a PageIndicator) -> Self {
+        Self { 
+            text: text.into(),
+            page_indicator: page_indicator
         }
     }
 }
 
-impl Widget for &TitleBar {
+impl <'a> Widget for &TitleBar <'a> {
     fn render(self, area: Rect, buf: &mut Buffer) {
         let chunks = Layout::horizontal([
             Constraint::Fill(1),
@@ -31,7 +29,7 @@ impl Widget for &TitleBar {
         ])
         .split(area);
 
-        PageIndicator::default()
+        self.page_indicator
             .render(chunks[0], buf);
         
         let padded_title = add_padding(1, vec![self.text.to_string()])

@@ -5,7 +5,7 @@ use ratatui::{
 };
 use ratatui_comfy_toaster::{ToastBuilder, ToastEngine, ToastEngineBuilder, ToastMessage};
 
-use crate::{colors::ROSE, common::{db::{self, DB}, goal::GoalSheet, types::{Error, ErrorLevel::FATAL}}, utils::padding::add_padding, widgets::{bottom_bar::BottomBar, title::TitleBar}};
+use crate::{colors::ROSE, common::{db::{self, DB}, goal::GoalSheet, types::{Error, ErrorLevel::FATAL}}, utils::padding::add_padding, widgets::{bottom_bar::BottomBar, page::PageIndicator, title::TitleBar}};
 
 mod colors;
 mod widgets;
@@ -19,7 +19,8 @@ struct App {
     conn: DB,
     error: Option<Error>,
     exit: bool,
-    toast_engine: Option<ToastEngine<ToastMessage>>
+    toast_engine: Option<ToastEngine<ToastMessage>>,
+    page_indicator: PageIndicator
 }
 
 impl App {
@@ -32,7 +33,8 @@ impl App {
             conn,
             exit: false,
             leader_until: None,
-            toast_engine: None
+            toast_engine: None,
+            page_indicator: PageIndicator::default()
         }
     }
     pub fn run(&mut self, terminal: &mut DefaultTerminal) -> io::Result<()> {
@@ -62,6 +64,10 @@ impl App {
         Ok(())
     }
 
+    fn is_leader_active(&self) -> bool{
+        return self.leader_until.is_some_and(|until| until >= Instant::now());
+    }
+
     fn handle_key_event(&mut self, key_event: KeyEvent) {
         match (key_event.code, key_event.modifiers) {
             (KeyCode::Char('a'), KeyModifiers::CONTROL) => {
@@ -69,11 +75,14 @@ impl App {
             }
             _ => {}
         }
-        match key_event.code {
-            KeyCode::Char('q') => self.exit(),
-            KeyCode::Left => self.message = "Left pressed".to_string(),
-            KeyCode::Right => self.message = "Right pressed".to_string(),
-            _ => {}
+        if self.is_leader_active(){
+            match key_event.code {
+                KeyCode::Char('q') => self.exit(),
+                KeyCode::Char('1') => self.page_indicator.current = 1,
+                KeyCode::Char('2') => self.page_indicator.current = 2,
+                KeyCode::Char('3') => self.page_indicator.current = 3,
+                _ => {}
+            }
         }
     }
 
@@ -91,7 +100,7 @@ impl Widget for &App {
         ])
         .split(area);
         
-        let title_bar = TitleBar::default();
+        let title_bar = TitleBar::new("MultiNui Goals Manager", &self.page_indicator);
         title_bar.render(chunks[0], buf);
 
         BottomBar::new(&self.leader_until)
