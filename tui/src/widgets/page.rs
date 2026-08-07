@@ -29,8 +29,7 @@ impl Default for PageIndicator {
             current: 1,
             pages: vec![
                 Page::new(1, "Home", "H"),
-                Page::new(2, "Logs", " L"),
-                Page::new(3, "Settings", " S"),
+                Page::new(2, "Settings", " S"),
             ],
         }
     }

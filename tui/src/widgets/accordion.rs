@@ -30,8 +30,10 @@ impl Accordion {
 impl Widget for Accordion {
     fn render(self, area: ratatui::prelude::Rect, buf: &mut ratatui::prelude::Buffer)
     {
-        let title_string = padding::add_padding((self.level as usize) * 4, vec![self.title]);
-        let title = Line::from(title_string.first());
+        let title_string = padding::add_padding((self.level as usize) * 4, vec![self.title])
+            .first()
+            .unwrap()
+            .clone();
+        Line::from(title_string).render(area, buf);
     }
-    
 }

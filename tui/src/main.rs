@@ -1,11 +1,11 @@
 use std::{io, time::{Duration, Instant}};
 
 use ratatui::{
-    DefaultTerminal, Frame, crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind, KeyModifiers}, style::Style, widgets::{Block, Borders, Tabs, Widget},
+    DefaultTerminal, Frame, crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind, KeyModifiers}, style::Style, widgets::{Block, Borders, Padding, Tabs, Widget},
 };
 use ratatui_comfy_toaster::{ToastBuilder, ToastEngine, ToastEngineBuilder, ToastMessage};
 
-use crate::{colors::ROSE, common::{db::{self, DB}, goal::GoalSheet, types::{Error, ErrorLevel::FATAL}}, utils::padding::add_padding, widgets::{bottom_bar::BottomBar, page::PageIndicator, title::TitleBar}};
+use crate::{colors::ROSE, common::{db::{self, DB}, goal::GoalSheet, types::{Error, ErrorLevel::FATAL}}, utils::padding::add_padding, widgets::{bottom_bar::BottomBar, goals_tab::GoalTab, page::PageIndicator, title::TitleBar}};
 
 mod colors;
 mod widgets;
@@ -15,12 +15,13 @@ mod common;
 struct App {
     message: String,
     leader_until: Option<Instant>,
-    goal_sheet: Vec<GoalSheet>,
     conn: DB,
     error: Option<Error>,
     exit: bool,
     toast_engine: Option<ToastEngine<ToastMessage>>,
-    page_indicator: PageIndicator
+    page_indicator: PageIndicator,
+    goal_sheets: Vec<GoalSheet>,
+    current_tab: usize
 }
 
 impl App {
@@ -29,12 +30,13 @@ impl App {
         return Self { 
             error: None,
             message: "".to_string(),
-            goal_sheet: Vec::new(),
+            goal_sheets: Vec::new(),
             conn,
             exit: false,
             leader_until: None,
             toast_engine: None,
-            page_indicator: PageIndicator::default()
+            page_indicator: PageIndicator::default(),
+            current_tab: 0
         }
     }
     pub fn run(&mut self, terminal: &mut DefaultTerminal) -> io::Result<()> {
@@ -78,9 +80,12 @@ impl App {
         if self.is_leader_active(){
             match key_event.code {
                 KeyCode::Char('q') => self.exit(),
-                KeyCode::Char('1') => self.page_indicator.current = 1,
-                KeyCode::Char('2') => self.page_indicator.current = 2,
-                KeyCode::Char('3') => self.page_indicator.current = 3,
+                KeyCode::Char('h') => self.page_indicator.current = 1,
+                KeyCode::Char('s') => self.page_indicator.current = 2,
+                KeyCode::Char(c @ '1'..='9') => {
+                    let page: usize = c.to_digit(10).unwrap() as usize - 1;
+                    self.current_tab = page
+                }
                 _ => {}
             }
         }
@@ -100,8 +105,18 @@ impl Widget for &App {
         ])
         .split(area);
         
+        let title_block = Block::new();
+        let title_block_area = title_block.inner(chunks[0]);
         let title_bar = TitleBar::new("MultiNui Goals Manager", &self.page_indicator);
-        title_bar.render(chunks[0], buf);
+        title_bar.render(title_block_area, buf);
+        title_block.render(chunks[0], buf);
+
+        let block = Block::new()
+            .padding(Padding::from(0));
+        let inner = block.inner(chunks[1]);
+        GoalTab::new(self.current_tab, add_padding(2, vec!["Tab 1".into(), "Tab2".into()]))
+            .render(inner, buf);
+        block.render(chunks[1], buf);
 
         BottomBar::new(&self.leader_until)
             .render(chunks[2], buf);
