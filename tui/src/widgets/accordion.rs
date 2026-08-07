@@ -1,16 +1,10 @@
 use ratatui::{text::Line, widgets::Widget};
 
-use crate::utils::padding;
+use crate::{utils::padding, widgets::status::Status};
 
 pub enum AccordionItem {
     Text(String),
     Section(Accordion),
-}
-
-pub enum Status {
-    Complete,
-    Pending,
-    WIP
 }
 
 pub struct Accordion{

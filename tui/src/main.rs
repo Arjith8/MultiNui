@@ -1,11 +1,11 @@
 use std::{io, time::{Duration, Instant}};
 
 use ratatui::{
-    DefaultTerminal, Frame, crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind, KeyModifiers}, style::Style, widgets::{Block, Borders, Padding, Tabs, Widget},
+    DefaultTerminal, Frame, crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind, KeyModifiers}, layout::{Constraint, Layout}, style::Style, widgets::{Block, Borders, Padding, Tabs, Widget},
 };
 use ratatui_comfy_toaster::{ToastBuilder, ToastEngine, ToastEngineBuilder, ToastMessage};
 
-use crate::{colors::ROSE, common::{db::{self, DB}, goal::GoalSheet, types::{Error, ErrorLevel::FATAL}}, utils::padding::add_padding, widgets::{bottom_bar::BottomBar, goals_tab::GoalTab, page::PageIndicator, title::TitleBar}};
+use crate::{colors::ROSE, common::{db::{self, DB}, goal::GoalSheet, types::{Error, ErrorLevel::FATAL}}, utils::padding::add_padding, widgets::{bottom_bar::BottomBar, goals_tab::GoalTab, page::PageIndicator, status::Status, title::TitleBar}};
 
 mod colors;
 mod widgets;
@@ -114,8 +114,15 @@ impl Widget for &App {
         let block = Block::new()
             .padding(Padding::from(0));
         let inner = block.inner(chunks[1]);
+        let block_chunks = Layout::horizontal([
+            Constraint::Fill(1),
+            Constraint::Fill(1)
+        ]).split(inner);
+
         GoalTab::new(self.current_tab, add_padding(2, vec!["Tab 1".into(), "Tab2".into()]))
-            .render(inner, buf);
+            .render(block_chunks[0], buf);
+
+        Status::Complete.render(block_chunks[1], buf);
         block.render(chunks[1], buf);
 
         BottomBar::new(&self.leader_until)

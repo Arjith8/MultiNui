@@ -4,3 +4,4 @@ pub mod page;
 pub mod bottom_bar;
 pub mod home;
 pub mod accordion;
+pub mod status;
