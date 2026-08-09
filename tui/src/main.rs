@@ -1,11 +1,11 @@
 use std::{io, time::{Duration, Instant}};
 
 use ratatui::{
-    DefaultTerminal, Frame, crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind, KeyModifiers}, layout::{Constraint, Layout}, style::Style, widgets::{Block, Borders, Padding, Tabs, Widget},
+    DefaultTerminal, Frame, crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind, KeyModifiers}, layout::{Constraint, Layout}, style::Style, widgets::{Block, Borders, List, Padding, Tabs, Widget},
 };
 use ratatui_comfy_toaster::{ToastBuilder, ToastEngine, ToastEngineBuilder, ToastMessage};
 
-use crate::{colors::ROSE, common::{db::{self, DB}, goal::GoalSheet, types::{Error, ErrorLevel::FATAL}}, utils::padding::add_padding, widgets::{bottom_bar::BottomBar, goals_tab::GoalTab, page::PageIndicator, status::Status, title::TitleBar}};
+use crate::{colors::ROSE, common::{db::{self, DB}, goal::GoalSheet, types::{Error, ErrorLevel::FATAL}}, utils::padding::add_padding, widgets::{accordion::Accordion, bottom_bar::BottomBar, goals_tab::GoalTab, page::PageIndicator, status::Status, title::TitleBar}};
 
 mod colors;
 mod widgets;
@@ -114,15 +114,24 @@ impl Widget for &App {
         let block = Block::new()
             .padding(Padding::from(0));
         let inner = block.inner(chunks[1]);
-        let block_chunks = Layout::horizontal([
-            Constraint::Fill(1),
+        let block_chunks = Layout::vertical([
+            Constraint::Length(1),
             Constraint::Fill(1)
         ]).split(inner);
 
         GoalTab::new(self.current_tab, add_padding(2, vec!["Tab 1".into(), "Tab2".into()]))
             .render(block_chunks[0], buf);
 
-        Status::Complete.render(block_chunks[1], buf);
+        let main_block = Block::new()
+            .borders(Borders::ALL);
+
+        let main_block_inner = main_block.inner(block_chunks[1]);
+        let all_goals = GoalSheet::get_all();
+        List::new(all_goals.iter().map(|goal| goal.name.clone()))
+            .render(main_block_inner, buf);
+
+        main_block.render(block_chunks[1], buf);
+
         block.render(chunks[1], buf);
 
         BottomBar::new(&self.leader_until)

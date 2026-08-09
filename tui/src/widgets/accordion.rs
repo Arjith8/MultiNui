@@ -16,7 +16,7 @@ pub struct Accordion{
 }
 
 impl Accordion {
-    fn new(self, title: String, level: u8 ) -> Self{
+    pub fn new(title: String, level: u8 ) -> Self{
         return Self { title, content: None, is_open: false, level: level, status: Status::Pending }
     }
 }
