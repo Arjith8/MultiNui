@@ -1,4 +1,4 @@
-use ratatui::{style::{Color, Style}, text::Span, widgets::{Block, BorderType, Borders, Widget}};
+use ratatui::{style::{Color, Style}, text::Span, widgets::Widget};
 
 pub enum Status {
     Complete,

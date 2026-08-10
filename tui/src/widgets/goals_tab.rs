@@ -1,7 +1,6 @@
 use ratatui::{buffer::Buffer, layout::Rect, style::Style, widgets::{Tabs, Widget}};
-use uuid::Uuid;
 
-use crate::{App, colors::ROSE, common::goal::GoalSheet, utils::padding::add_padding};
+use crate::{colors::ROSE};
 
 pub struct GoalTab {
     current_goal_tab: usize,
@@ -10,10 +9,10 @@ pub struct GoalTab {
 
 impl GoalTab {
     pub fn new(current_goal_tab: usize, goal_tabs: Vec<String>) -> Self{
-        return Self {
-            current_goal_tab: current_goal_tab,
-            goal_tabs: goal_tabs
-        };
+        Self {
+            current_goal_tab,
+            goal_tabs
+        }
     }
 }
 

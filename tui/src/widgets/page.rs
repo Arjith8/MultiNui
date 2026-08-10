@@ -1,4 +1,4 @@
-use ratatui::{style::{Style, palette::material::PINK}, text::{Line, Span}, widgets::{Block, Borders, Paragraph, Widget}};
+use ratatui::{style::Style, text::{Line, Span}, widgets::{Paragraph, Widget}};
 
 use crate::colors::IRIS;
 

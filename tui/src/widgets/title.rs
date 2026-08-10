@@ -1,5 +1,5 @@
 use ratatui::{
-    layout::{Alignment, Constraint, Layout}, prelude::{Buffer, Rect, Style}, style::Stylize, text::Line, widgets::{Block, Borders, Tabs, Widget},
+    layout::{Alignment, Constraint, Layout}, prelude::{Buffer, Rect, Style}, style::Stylize, widgets::{Block, Widget},
 };
 
 use crate::{colors::{IRIS, LOVE, ROSE}, utils::padding::add_padding, widgets::page::PageIndicator};
@@ -13,7 +13,7 @@ impl <'a> TitleBar <'a> {
     pub fn new(text: impl Into<String>, page_indicator: &'a PageIndicator) -> Self {
         Self { 
             text: text.into(),
-            page_indicator: page_indicator
+            page_indicator
         }
     }
 }

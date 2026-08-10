@@ -1,11 +1,11 @@
 use std::{io, time::{Duration, Instant}};
 
 use ratatui::{
-    DefaultTerminal, Frame, crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind, KeyModifiers}, layout::{Constraint, Layout}, style::Style, widgets::{Block, Borders, List, Padding, Tabs, Widget},
+    DefaultTerminal, Frame, crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind, KeyModifiers}, layout::{Constraint, Layout}, widgets::{Block, Borders, List, Padding, Widget},
 };
-use ratatui_comfy_toaster::{ToastBuilder, ToastEngine, ToastEngineBuilder, ToastMessage};
+use ratatui_comfy_toaster::{ToastEngine, ToastEngineBuilder, ToastMessage};
 
-use crate::{colors::ROSE, common::{db::{self, DB}, goal::GoalSheet, types::{Error, ErrorLevel::FATAL}}, utils::padding::add_padding, widgets::{accordion::Accordion, bottom_bar::BottomBar, goals_tab::GoalTab, page::PageIndicator, status::Status, title::TitleBar}};
+use crate::{common::{db::{self, DB}, goal::GoalSheet, types::Error}, utils::padding::add_padding, widgets::{bottom_bar::BottomBar, goals_tab::GoalTab, page::PageIndicator, title::TitleBar}};
 
 mod colors;
 mod widgets;
@@ -27,7 +27,7 @@ struct App {
 impl App {
     pub fn new() -> Self{
         let conn = db::DB::open().unwrap();
-        return Self { 
+        Self { 
             error: None,
             message: "".to_string(),
             goal_sheets: Vec::new(),
@@ -67,15 +67,12 @@ impl App {
     }
 
     fn is_leader_active(&self) -> bool{
-        return self.leader_until.is_some_and(|until| until >= Instant::now());
+        self.leader_until.is_some_and(|until| until >= Instant::now())
     }
 
     fn handle_key_event(&mut self, key_event: KeyEvent) {
-        match (key_event.code, key_event.modifiers) {
-            (KeyCode::Char('a'), KeyModifiers::CONTROL) => {
-                self.leader_until = Some(Instant::now() + Duration::from_secs(2));
-            }
-            _ => {}
+        if let (KeyCode::Char('a'), KeyModifiers::CONTROL) = (key_event.code, key_event.modifiers) {
+            self.leader_until = Some(Instant::now() + Duration::from_secs(2));
         }
         if self.is_leader_active(){
             match key_event.code {

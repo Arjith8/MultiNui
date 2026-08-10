@@ -1,6 +1,6 @@
 use std::time::Instant;
 
-use ratatui::{layout::{Constraint, Layout}, style::{Color, Stylize}, widgets::{Block, Borders, Widget}};
+use ratatui::{layout::{Constraint, Layout}, style::Stylize, widgets::{Block, Widget}};
 
 use crate::colors::{IRIS, ROSE};
 
@@ -10,8 +10,8 @@ pub struct BottomBar<'a> {
 
 impl <'a> BottomBar<'a> {
     pub fn new(leader_until: &'a Option<Instant>) -> Self{
-        return Self {
-            leader_until: leader_until
+        Self {
+            leader_until
         }
     }
 }

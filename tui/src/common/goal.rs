@@ -49,7 +49,7 @@ impl GoalSheet {
     }
     fn new(name: String) -> Self {
         let id: Uuid = Uuid::new_v4();
-        return Self { id: id,  name, goals: vec![] }
+        Self { id,  name, goals: vec![] }
     }
 }
 
