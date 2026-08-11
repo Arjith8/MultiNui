@@ -6,6 +6,12 @@ pub enum Status {
     WIP
 }
 
+impl Default for Status{
+    fn default() -> Self {
+        Self::Pending
+    }
+}
+
 impl Widget for Status {
     fn render(self, area: ratatui::prelude::Rect, buf: &mut ratatui::prelude::Buffer)
     {

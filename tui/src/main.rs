@@ -1,11 +1,11 @@
 use std::{io, time::{Duration, Instant}};
 
 use ratatui::{
-    DefaultTerminal, Frame, crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind, KeyModifiers}, layout::{Constraint, Layout}, widgets::{Block, Borders, List, Padding, Widget},
+    DefaultTerminal, Frame, crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind, KeyModifiers}, layout::{Constraint, Layout}, widgets::{Block, Borders, List, ListState, Padding, StatefulWidget, Widget},
 };
 use ratatui_comfy_toaster::{ToastEngine, ToastEngineBuilder, ToastMessage};
 
-use crate::{common::{db::{self, DB}, goal::GoalSheet, types::Error}, utils::padding::add_padding, widgets::{bottom_bar::BottomBar, goals_tab::GoalTab, page::PageIndicator, title::TitleBar}};
+use crate::{common::{db::{self, DB}, goal::Goal, types::Error}, utils::padding::add_padding, widgets::{bottom_bar::BottomBar, goals_tab::GoalTab, page::PageIndicator, title::TitleBar}};
 
 mod colors;
 mod widgets;
@@ -20,7 +20,7 @@ struct App {
     exit: bool,
     toast_engine: Option<ToastEngine<ToastMessage>>,
     page_indicator: PageIndicator,
-    goal_sheets: Vec<GoalSheet>,
+    goals: Vec<Goal>,
     current_tab: usize
 }
 
@@ -30,7 +30,7 @@ impl App {
         Self { 
             error: None,
             message: "".to_string(),
-            goal_sheets: Vec::new(),
+            goals: Vec::new(),
             conn,
             exit: false,
             leader_until: None,
@@ -99,37 +99,28 @@ impl Widget for &App {
             ratatui::prelude::Constraint::Length(1),
             ratatui::prelude::Constraint::Fill(1),
             ratatui::prelude::Constraint::Length(1),
-        ])
-        .split(area);
+        ]).split(area);
         
-        let title_block = Block::new();
-        let title_block_area = title_block.inner(chunks[0]);
-        let title_bar = TitleBar::new("MultiNui Goals Manager", &self.page_indicator);
-        title_bar.render(title_block_area, buf);
-        title_block.render(chunks[0], buf);
+        TitleBar::new("MultiNui Goals Manager", &self.page_indicator)
+            .render(chunks[0], buf);
 
-        let block = Block::new()
-            .padding(Padding::from(0));
-        let inner = block.inner(chunks[1]);
-        let block_chunks = Layout::vertical([
+        let goal_chunks = Layout::vertical([
             Constraint::Length(1),
             Constraint::Fill(1)
-        ]).split(inner);
+        ]).split(chunks[1]);
 
         GoalTab::new(self.current_tab, add_padding(2, vec!["Tab 1".into(), "Tab2".into()]))
-            .render(block_chunks[0], buf);
+            .render(goal_chunks[0], buf);
 
-        let main_block = Block::new()
+        let block = Block::new()
             .borders(Borders::ALL);
 
-        let main_block_inner = main_block.inner(block_chunks[1]);
-        let all_goals = GoalSheet::get_all();
-        List::new(all_goals.iter().map(|goal| goal.name.clone()))
-            .render(main_block_inner, buf);
+        let inner = block.inner(goal_chunks[1]);
+        Goal::new("Todalooo".into(), Some("Haiiiyaaaaaa".into()))
+            .render(inner, buf);
 
-        main_block.render(block_chunks[1], buf);
-
-        block.render(chunks[1], buf);
+        block.render(goal_chunks[1], buf);
+        
 
         BottomBar::new(&self.leader_until)
             .render(chunks[2], buf);
