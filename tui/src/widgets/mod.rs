@@ -5,3 +5,4 @@ pub mod bottom_bar;
 pub mod home;
 pub mod accordion;
 pub mod status;
+pub mod goal_list;

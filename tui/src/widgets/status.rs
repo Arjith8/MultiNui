@@ -1,4 +1,4 @@
-use ratatui::{style::{Color, Style}, text::Span, widgets::Widget};
+use ratatui::{style::{Color::{self, Gray, Green, Yellow}, Style}, text::Span, widgets::Widget};
 
 pub enum Status {
     Complete,
@@ -12,16 +12,20 @@ impl Default for Status{
     }
 }
 
+impl Status {
+    pub fn widget(&self) -> Span<'static> {
+        match self {
+            Self::Complete => Span::styled("●", Style::default().fg(Green)),
+            Self::Pending => Span::styled("●", Style::default().fg(Yellow)),
+            Self::WIP => Span::styled("●", Style::default().fg(Gray)),
+        }
+    }
+    
+}
+
 impl Widget for Status {
     fn render(self, area: ratatui::prelude::Rect, buf: &mut ratatui::prelude::Buffer)
     {
-        let color = match self {
-            Self::Complete => Color::Green,
-            Self::Pending => Color::Yellow,
-            Self::WIP => Color::Gray,
-        };
-
-        Span::styled("⬤ ", Style::default().fg(color))
-            .render(area, buf);
+        self.widget().render(area, buf);
     }
 }

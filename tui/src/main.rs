@@ -1,11 +1,11 @@
-use std::{io, time::{Duration, Instant}};
+use std::{io, os::linux::raw::stat, time::{Duration, Instant}};
 
 use ratatui::{
     DefaultTerminal, Frame, crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind, KeyModifiers}, layout::{Constraint, Layout}, widgets::{Block, Borders, List, ListState, Padding, StatefulWidget, Widget},
 };
 use ratatui_comfy_toaster::{ToastEngine, ToastEngineBuilder, ToastMessage};
 
-use crate::{common::{db::{self, DB}, goal::Goal, types::Error}, utils::padding::add_padding, widgets::{bottom_bar::BottomBar, goals_tab::GoalTab, page::PageIndicator, title::TitleBar}};
+use crate::{common::{db::{self, DB}, goal::Goal, types::Error}, utils::padding::add_padding, widgets::{bottom_bar::BottomBar, goal_list::GoalList, goals_tab::GoalTab, page::PageIndicator, title::TitleBar}};
 
 mod colors;
 mod widgets;
@@ -116,8 +116,8 @@ impl Widget for &App {
             .borders(Borders::ALL);
 
         let inner = block.inner(goal_chunks[1]);
-        Goal::new("Todalooo".into(), Some("Haiiiyaaaaaa".into()))
-            .render(inner, buf);
+        let mut state = ListState::default();
+        GoalList::default().render(inner, buf, &mut state);
 
         block.render(goal_chunks[1], buf);
         

@@ -1,4 +1,4 @@
-use ratatui::{text::{Line, Text}, widgets::{List, Widget}};
+use ratatui::{layout::{Constraint, Layout}, text::{Line, Span, Text}, widgets::{Block, List, Paragraph, Widget}};
 use uuid::Uuid;
 
 use crate::widgets::status::Status;
@@ -21,11 +21,24 @@ impl Goal {
             status: Status::default()
         }
     }
+    pub fn widget(&self) -> Line<'static>{
+        Line::from(vec![
+            Span::raw(" "),
+            self.status.widget(),
+            Span::raw(" "),
+            Span::raw(self.name.clone())
+        ])
+    }
 }
 
 impl Widget for Goal{
     fn render(self, area: ratatui::prelude::Rect, buf: &mut ratatui::prelude::Buffer)
     {
-        Text::from(self.name).render(area, buf);
+        Line::from(vec![
+            Span::raw(" "),
+            self.status.widget(),
+            Span::raw(" "),
+            Span::raw(self.name)
+        ]).render(area, buf);
     }
 }
