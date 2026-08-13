@@ -31,6 +31,18 @@ impl Goal {
     }
 }
 
+impl Default for Goal{
+    fn default() -> Self {
+        Self { 
+            id: Uuid::new_v4(), 
+            name: "You have not added any goals yet, to add press \"n\"".into(), 
+            description: None,
+            sub_goals: vec![],
+            status: Status::WIP
+        }
+    }
+}
+
 impl Widget for Goal{
     fn render(self, area: ratatui::prelude::Rect, buf: &mut ratatui::prelude::Buffer)
     {

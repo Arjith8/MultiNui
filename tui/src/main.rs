@@ -13,30 +13,24 @@ mod utils;
 mod common;
 
 struct App {
-    message: String,
     leader_until: Option<Instant>,
-    conn: DB,
-    error: Option<Error>,
     exit: bool,
     toast_engine: Option<ToastEngine<ToastMessage>>,
     page_indicator: PageIndicator,
-    goals: Vec<Goal>,
-    current_tab: usize
+    current_tab: usize,
+    goal_view_active: bool
 }
 
 impl App {
     pub fn new() -> Self{
         let conn = db::DB::open().unwrap();
         Self { 
-            error: None,
-            message: "".to_string(),
-            goals: Vec::new(),
-            conn,
             exit: false,
             leader_until: None,
             toast_engine: None,
             page_indicator: PageIndicator::default(),
-            current_tab: 0
+            current_tab: 0,
+            goal_view_active: true
         }
     }
     pub fn run(&mut self, terminal: &mut DefaultTerminal) -> io::Result<()> {
@@ -79,6 +73,9 @@ impl App {
                 KeyCode::Char('q') => self.exit(),
                 KeyCode::Char('h') => self.page_indicator.current = 1,
                 KeyCode::Char('s') => self.page_indicator.current = 2,
+                KeyCode::Char('g') => {
+                    self.goal_view_active = !self.goal_view_active
+                },
                 KeyCode::Char(c @ '1'..='9') => {
                     let page: usize = c.to_digit(10).unwrap() as usize - 1;
                     self.current_tab = page
@@ -117,11 +114,13 @@ impl Widget for &App {
 
         let inner = block.inner(goal_chunks[1]);
         let mut state = ListState::default();
-        GoalList::default().render(inner, buf, &mut state);
+        state.select_first();
+        let goal_list = GoalList::new(self.goal_view_active);
+        goal_list.render(inner, buf, &mut state);
+        
 
         block.render(goal_chunks[1], buf);
         
-
         BottomBar::new(&self.leader_until)
             .render(chunks[2], buf);
     }
