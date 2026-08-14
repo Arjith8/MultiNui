@@ -70,15 +70,9 @@ impl StatefulWidget for GoalList{
             .into_iter()
             .map(|goal| goal.widget())
             .collect();
-        if self.is_active {
-            state.select_first();
-        } else {
-            state.select(None);
-        }
         List::new(goals)
             .style(Color::White)
             .highlight_style(Style::new().yellow().italic())
-            .highlight_symbol("> ".red())
             .scroll_padding(1)
             .repeat_highlight_symbol(true)
             .render(area, buf, state);

@@ -18,19 +18,20 @@ struct App {
     toast_engine: Option<ToastEngine<ToastMessage>>,
     page_indicator: PageIndicator,
     current_tab: usize,
-    goal_view_active: bool
+    goal_view_active: bool,
+    goal_list_item_idx: usize,
 }
 
 impl App {
     pub fn new() -> Self{
-        let conn = db::DB::open().unwrap();
         Self { 
             exit: false,
             leader_until: None,
             toast_engine: None,
             page_indicator: PageIndicator::default(),
             current_tab: 0,
-            goal_view_active: true
+            goal_view_active: true,
+            goal_list_item_idx: 0,
         }
     }
     pub fn run(&mut self, terminal: &mut DefaultTerminal) -> io::Result<()> {
@@ -69,6 +70,7 @@ impl App {
             self.leader_until = Some(Instant::now() + Duration::from_secs(2));
         }
         if self.is_leader_active(){
+            println!("{:?}", key_event);
             match key_event.code {
                 KeyCode::Char('q') => self.exit(),
                 KeyCode::Char('h') => self.page_indicator.current = 1,
@@ -82,6 +84,19 @@ impl App {
                 }
                 _ => {}
             }
+        }
+        match key_event.code {
+            KeyCode::Up => {
+                if self.goal_view_active{
+                    self.goal_list_item_idx = self.goal_list_item_idx.saturating_sub(1);
+                }
+            }
+            KeyCode::Down => {
+                if self.goal_view_active{
+                    self.goal_list_item_idx += 1;
+                }
+            }
+            _ => {}
         }
     }
 
@@ -114,7 +129,7 @@ impl Widget for &App {
 
         let inner = block.inner(goal_chunks[1]);
         let mut state = ListState::default();
-        state.select_first();
+        state.select(Some(self.goal_list_item_idx));
         let goal_list = GoalList::new(self.goal_view_active);
         goal_list.render(inner, buf, &mut state);
         
