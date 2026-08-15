@@ -1,11 +1,11 @@
-use std::{io, os::linux::raw::stat, time::{Duration, Instant}};
+use std::{io, time::{Duration, Instant}};
 
 use ratatui::{
-    DefaultTerminal, Frame, crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind, KeyModifiers}, layout::{Constraint, Layout}, widgets::{Block, Borders, List, ListState, Padding, StatefulWidget, Widget},
+    DefaultTerminal, Frame, crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind, KeyModifiers}, layout::{Constraint, Layout}, widgets::{Block, Borders, ListState, StatefulWidget, Widget},
 };
 use ratatui_comfy_toaster::{ToastEngine, ToastEngineBuilder, ToastMessage};
 
-use crate::{common::{db::{self, DB}, goal::Goal, types::Error}, utils::padding::add_padding, widgets::{bottom_bar::BottomBar, goal_list::GoalList, goals_tab::GoalTab, page::PageIndicator, title::TitleBar}};
+use crate::{utils::padding::add_padding, widgets::{bottom_bar::BottomBar, goal_list::GoalList, goals_tab::GoalTab, page::PageIndicator, title::TitleBar}};
 
 mod colors;
 mod widgets;
@@ -91,11 +91,10 @@ impl App {
                     self.goal_list_item_idx = self.goal_list_item_idx.saturating_sub(1);
                 }
             }
-            KeyCode::Down => {
-                if self.goal_view_active{
+            KeyCode::Down
+                if self.goal_view_active=> {
                     self.goal_list_item_idx += 1;
                 }
-            }
             _ => {}
         }
     }

@@ -1,4 +1,4 @@
-use ratatui::{style::{Color, Style, Stylize}, text::Line, widgets::{List, ListDirection, ListState, StatefulWidget}};
+use ratatui::{style::{Color, Style, Stylize}, text::Line, widgets::{List, ListState, StatefulWidget}};
 use uuid::Uuid;
 
 use crate::{common::goal::Goal, widgets::status::Status};
@@ -10,16 +10,16 @@ pub struct GoalList {
 
 impl Default for GoalList{
     fn default() -> Self {
-        return Self { goals: Some(vec![Goal::default()]), is_active: false }
+        Self { goals: Some(vec![Goal::default()]), is_active: false }
     }
 }
 
 impl GoalList {
     pub fn new(is_active: bool) -> Self {
-        Self { goals: None, is_active: is_active }
+        Self { goals: None, is_active }
     }
     pub fn fetch_goals() -> Option<Vec<Goal>>{
-        return Some(vec![
+        Some(vec![
             Goal {
                 id: Uuid::new_v4(),
                 name: "ML".into(),

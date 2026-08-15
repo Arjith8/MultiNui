@@ -1,4 +1,4 @@
-use ratatui::{layout::{Constraint, Layout}, text::{Line, Span, Text}, widgets::{Block, List, Paragraph, Widget}};
+use ratatui::{text::{Line, Span}, widgets::Widget};
 use uuid::Uuid;
 
 use crate::widgets::status::Status;
