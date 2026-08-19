@@ -5,7 +5,7 @@ use ratatui::{
 };
 use ratatui_comfy_toaster::{ToastEngine, ToastEngineBuilder, ToastMessage};
 
-use crate::{utils::padding::add_padding, widgets::{bottom_bar::BottomBar, goal_list::GoalList, goals_tab::GoalTab, page::PageIndicator, title::TitleBar}};
+use crate::{utils::padding::add_padding, widgets::{bottom_bar::BottomBar, goal_list::{GoalList, GoalListWidget}, goals_tab::GoalTab, page::PageIndicator, title::TitleBar}};
 
 mod colors;
 mod widgets;
@@ -19,11 +19,12 @@ struct App {
     page_indicator: PageIndicator,
     current_tab: usize,
     goal_view_active: bool,
-    goal_list_item_idx: usize,
+    goals: GoalList
 }
 
 impl App {
     pub fn new() -> Self{
+        let goals = GoalList::fetch_goals();
         Self { 
             exit: false,
             leader_until: None,
@@ -31,7 +32,7 @@ impl App {
             page_indicator: PageIndicator::default(),
             current_tab: 0,
             goal_view_active: true,
-            goal_list_item_idx: 0,
+            goals
         }
     }
     pub fn run(&mut self, terminal: &mut DefaultTerminal) -> io::Result<()> {
@@ -88,13 +89,14 @@ impl App {
         match key_event.code {
             KeyCode::Up => {
                 if self.goal_view_active{
-                    self.goal_list_item_idx = self.goal_list_item_idx.saturating_sub(1);
+                    self.goals.current_idx = self.goals.current_idx.saturating_sub(1);
                 }
             }
-            KeyCode::Down
-                if self.goal_view_active=> {
-                    self.goal_list_item_idx += 1;
+            KeyCode::Down => {
+                if self.goal_view_active && self.goals.goals.clone().unwrap_or(vec![]).len() - 1 > self.goals.current_idx {
+                    self.goals.current_idx += 1;
                 }
+            }
             _ => {}
         }
     }
@@ -128,10 +130,9 @@ impl Widget for &App {
 
         let inner = block.inner(goal_chunks[1]);
         let mut state = ListState::default();
-        state.select(Some(self.goal_list_item_idx));
-        let goal_list = GoalList::new(self.goal_view_active);
-        goal_list.render(inner, buf, &mut state);
-        
+        state.select(Some(self.goals.current_idx));
+        let goal_widget = GoalListWidget::new(&self.goals);
+        goal_widget.render(inner, buf, &mut state);
 
         block.render(goal_chunks[1], buf);
         

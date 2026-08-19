@@ -1,5 +1,6 @@
 use ratatui::{style::{Color::{self, Gray, Green, Yellow}, Style}, text::Span, widgets::Widget};
 
+#[derive(Clone)]
 pub enum Status {
     Complete,
     Pending,

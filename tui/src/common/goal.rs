@@ -3,6 +3,7 @@ use uuid::Uuid;
 
 use crate::widgets::status::Status;
 
+#[derive(Clone)]
 pub struct Goal {
     pub id: Uuid,
     pub name: String,

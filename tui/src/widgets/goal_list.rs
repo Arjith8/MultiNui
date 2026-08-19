@@ -3,23 +3,21 @@ use uuid::Uuid;
 
 use crate::{common::goal::Goal, widgets::status::Status};
 
+#[derive(Clone)]
 pub struct GoalList {
-    goals: Option<Vec<Goal>>,
-    is_active: bool
+    pub goals: Option<Vec<Goal>>,
+    pub current_idx: usize
 }
 
 impl Default for GoalList{
     fn default() -> Self {
-        Self { goals: Some(vec![Goal::default()]), is_active: false }
+        Self { goals: Some(vec![Goal::default()]), current_idx:0 }
     }
 }
 
 impl GoalList {
-    pub fn new(is_active: bool) -> Self {
-        Self { goals: None, is_active }
-    }
-    pub fn fetch_goals() -> Option<Vec<Goal>>{
-        Some(vec![
+    pub fn fetch_goals() -> GoalList{
+        GoalList{ current_idx:0, goals: Some(vec![
             Goal {
                 id: Uuid::new_v4(),
                 name: "ML".into(),
@@ -58,18 +56,31 @@ impl GoalList {
                 ],
             },
         ])
-    }
-    
+    }}
 }
 
-impl StatefulWidget for GoalList{
+pub struct GoalListWidget<'a>{
+    goals: &'a GoalList
+}
+
+impl<'a> GoalListWidget<'a> {
+    pub fn new(goals: &'a GoalList) -> Self {
+        Self { goals }
+    }
+}
+
+
+impl <'a> StatefulWidget for GoalListWidget<'a>{
     type State = ListState;
     fn render(self, area: ratatui::prelude::Rect, buf: &mut ratatui::prelude::Buffer, state: &mut Self::State) {
-        let goals: Vec<Line> = GoalList::fetch_goals()
-            .unwrap_or_default()
-            .into_iter()
+        let goals: Vec<Line> = self.goals
+            .goals
+            .as_ref()
+            .unwrap_or(&Vec::new())
+            .iter()
             .map(|goal| goal.widget())
             .collect();
+
         List::new(goals)
             .style(Color::White)
             .highlight_style(Style::new().yellow().italic())
