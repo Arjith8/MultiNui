@@ -6,3 +6,4 @@ pub mod home;
 pub mod accordion;
 pub mod status;
 pub mod goal_list;
+pub mod popup;

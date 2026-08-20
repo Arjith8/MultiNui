@@ -1,11 +1,11 @@
 use std::{io, time::{Duration, Instant}};
 
 use ratatui::{
-    DefaultTerminal, Frame, crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind, KeyModifiers}, layout::{Constraint, Layout}, widgets::{Block, Borders, ListState, StatefulWidget, Widget},
+    DefaultTerminal, Frame, crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind, KeyModifiers}, layout::{Constraint, Layout, Rect}, style::Style, text::{Line, Text}, widgets::{Block, Borders, ListState, StatefulWidget, Widget},
 };
 use ratatui_comfy_toaster::{ToastEngine, ToastEngineBuilder, ToastMessage};
 
-use crate::{utils::padding::add_padding, widgets::{bottom_bar::BottomBar, goal_list::{GoalList, GoalListWidget}, goals_tab::GoalTab, page::PageIndicator, title::TitleBar}};
+use crate::{utils::padding::add_padding, widgets::{bottom_bar::BottomBar, goal_list::{GoalList, GoalListWidget}, goals_tab::GoalTab, page::PageIndicator, popup::{Dimensions, Popup}, title::TitleBar}};
 
 mod colors;
 mod widgets;
@@ -135,7 +135,10 @@ impl Widget for &App {
         goal_widget.render(inner, buf, &mut state);
 
         block.render(goal_chunks[1], buf);
-        
+
+
+        Popup::new(Line::from("Helllllooooo"), Dimensions::new(10, 10), || {})
+            .render(area, buf);
         BottomBar::new(&self.leader_until)
             .render(chunks[2], buf);
     }
