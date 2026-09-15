@@ -1,11 +1,11 @@
 use std::{io, time::{Duration, Instant}};
 
 use ratatui::{
-    DefaultTerminal, Frame, crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind, KeyModifiers}, layout::{Constraint, Layout, Rect}, style::{Color, Style, palette::material::YELLOW}, text::{Line, Text}, widgets::{Block, Borders, ListState, StatefulWidget, Widget},
+    DefaultTerminal, Frame, crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind, KeyModifiers}, layout::{Constraint, Layout}, style::{Color, Style}, widgets::{Block, Borders, ListState, StatefulWidget, Widget},
 };
 use ratatui_comfy_toaster::{ToastEngine, ToastEngineBuilder, ToastMessage};
 
-use crate::{common::goal::Goal, utils::padding::add_padding, widgets::{bottom_bar::BottomBar, goal_list::{GoalList, GoalListWidget}, goals_tab::GoalTab, page::PageIndicator, popup::{Dimensions, Popup}, title::TitleBar}};
+use crate::{common::goal::Goal, utils::padding::add_padding, widgets::{bottom_bar::BottomBar, goal_list::{GoalList, GoalListWidget}, goals_tab::GoalTab, page::PageIndicator, title::TitleBar}};
 
 mod colors;
 mod widgets;
@@ -87,12 +87,9 @@ impl App {
         }
 
         if self.goal_view_active {
-            match key_event.code {
-                KeyCode::Char('n') => {
-                    let goal = Goal::new("temp".to_string(), Some("deuhe".to_string()));
-                    self.goals.append(goal);
-                }
-                _ => {}
+            if let KeyCode::Char('n') = key_event.code {
+                let goal = Goal::new("temp".to_string(), Some("deuhe".to_string()));
+                self.goals.append(goal);
             }
         }
 
@@ -102,11 +99,10 @@ impl App {
                     self.goals.current_idx = self.goals.current_idx.saturating_sub(1);
                 }
             }
-            KeyCode::Down => {
-                if self.goal_view_active && self.goals.goals.clone().unwrap_or(vec![]).len() - 1 > self.goals.current_idx {
+            KeyCode::Down
+                if self.goal_view_active && self.goals.goals.clone().unwrap_or(vec![]).len() - 1 > self.goals.current_idx => {
                     self.goals.current_idx += 1;
                 }
-            }
             _ => {}
         }
     }

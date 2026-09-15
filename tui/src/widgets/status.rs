@@ -1,17 +1,14 @@
-use ratatui::{style::{Color::{self, Gray, Green, Yellow}, Style}, text::Span, widgets::Widget};
+use ratatui::{style::{Color::{Gray, Green, Yellow}, Style}, text::Span, widgets::Widget};
 
 #[derive(Clone)]
+#[derive(Default)]
 pub enum Status {
     Complete,
+    #[default]
     Pending,
     WIP
 }
 
-impl Default for Status{
-    fn default() -> Self {
-        Self::Pending
-    }
-}
 
 impl Status {
     pub fn widget(&self) -> Span<'static> {
