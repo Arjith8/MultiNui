@@ -1,11 +1,11 @@
 use std::{io, time::{Duration, Instant}};
 
 use ratatui::{
-    DefaultTerminal, Frame, crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind, KeyModifiers}, layout::{Constraint, Layout, Rect}, style::Style, text::{Line, Text}, widgets::{Block, Borders, ListState, StatefulWidget, Widget},
+    DefaultTerminal, Frame, crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind, KeyModifiers}, layout::{Constraint, Layout, Rect}, style::{Color, Style, palette::material::YELLOW}, text::{Line, Text}, widgets::{Block, Borders, ListState, StatefulWidget, Widget},
 };
 use ratatui_comfy_toaster::{ToastEngine, ToastEngineBuilder, ToastMessage};
 
-use crate::{utils::padding::add_padding, widgets::{bottom_bar::BottomBar, goal_list::{GoalList, GoalListWidget}, goals_tab::GoalTab, page::PageIndicator, popup::{Dimensions, Popup}, title::TitleBar}};
+use crate::{common::goal::Goal, utils::padding::add_padding, widgets::{bottom_bar::BottomBar, goal_list::{GoalList, GoalListWidget}, goals_tab::GoalTab, page::PageIndicator, popup::{Dimensions, Popup}, title::TitleBar}};
 
 mod colors;
 mod widgets;
@@ -71,7 +71,6 @@ impl App {
             self.leader_until = Some(Instant::now() + Duration::from_secs(2));
         }
         if self.is_leader_active(){
-            println!("{:?}", key_event);
             match key_event.code {
                 KeyCode::Char('q') => self.exit(),
                 KeyCode::Char('h') => self.page_indicator.current = 1,
@@ -86,6 +85,17 @@ impl App {
                 _ => {}
             }
         }
+
+        if self.goal_view_active {
+            match key_event.code {
+                KeyCode::Char('n') => {
+                    let goal = Goal::new("temp".to_string(), Some("deuhe".to_string()));
+                    self.goals.append(goal);
+                }
+                _ => {}
+            }
+        }
+
         match key_event.code {
             KeyCode::Up => {
                 if self.goal_view_active{
@@ -126,7 +136,14 @@ impl Widget for &App {
             .render(goal_chunks[0], buf);
 
         let block = Block::new()
-            .borders(Borders::ALL);
+            .borders(Borders::ALL)
+            .border_style(Style::new().fg(
+                if self.goal_view_active {
+                    colors::IRIS
+                } else {
+                    Color::White
+                }
+            ));
 
         let inner = block.inner(goal_chunks[1]);
         let mut state = ListState::default();
@@ -136,9 +153,6 @@ impl Widget for &App {
 
         block.render(goal_chunks[1], buf);
 
-
-        Popup::new(Line::from("Helllllooooo"), Dimensions::new(10, 10), || {})
-            .render(area, buf);
         BottomBar::new(&self.leader_until)
             .render(chunks[2], buf);
     }

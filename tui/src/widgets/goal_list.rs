@@ -57,6 +57,9 @@ impl GoalList {
             },
         ])
     }}
+    pub fn append(&mut self, goal: Goal){
+        self.goals.as_mut().unwrap().push(goal);
+    }
 }
 
 pub struct GoalListWidget<'a>{
