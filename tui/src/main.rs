@@ -5,7 +5,7 @@ use ratatui::{
 };
 use ratatui_comfy_toaster::{ToastEngine, ToastEngineBuilder, ToastMessage};
 
-use crate::{common::goal::Goal, utils::padding::add_padding, widgets::{bottom_bar::BottomBar, goal_list::{GoalList, GoalListWidget}, goals_tab::GoalTab, page::PageIndicator, title::TitleBar}};
+use crate::{common::goal::Goal, utils::padding::add_padding, widgets::{bottom_bar::BottomBar, goal_list::{GoalList, GoalListWidget}, goals_tab::GoalTab, page::PageIndicator, popup::Popup, title::TitleBar}};
 
 mod colors;
 mod widgets;
